@@ -449,6 +449,7 @@ body.rtl .lang-ar {
   cursor: pointer;
   border: none;
 }
+// ===== Button Variants =====
 
 .btn-primary {
   background: var(--gradient-primary);
