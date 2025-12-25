@@ -3,7 +3,7 @@
   /* Primary Colors - UAE Inspired (unchanged) */
   --primary: #b6913c;
   --primary-dark: #f0ba3c;
-  --primary-light: #e4d4a5;
+  --primary-light: #dcc37a;
 
   /* Secondary Colors (Light theme) */
   --secondary: #ffffff; /* main page background (light) */
@@ -50,8 +50,8 @@
   );
   --gradient-hero: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(245, 246, 248, 1) 100%
+    rgb(248, 235, 189) 0%,
+    rgb(242, 221, 117) 100%
   );
 
   /* Typography */
@@ -374,7 +374,7 @@ body.rtl .lang-ar {
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.75) 0%,
-    rgba(250, 242, 208, 0.7) 100%
+    rgba(130, 124, 97, 0.7) 100%
   );
   z-index: 1;
 }
@@ -462,8 +462,8 @@ body.rtl .lang-ar {
 
 .btn-secondary {
   background: transparent;
-  border: 2px solid var(--primary);
-  color: var(--primary);
+  border: 2px solid var(--secondary);
+  color: var(--secondary);
 }
 
 .btn-secondary:hover {
