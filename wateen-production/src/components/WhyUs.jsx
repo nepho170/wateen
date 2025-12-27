@@ -262,16 +262,8 @@ const WhyUs = () => {
           <div
             className="why-controls"
             aria-hidden={false}
-            style={{ marginTop: 12 }}
+            style={{ marginTop: 12, textAlign: "center" }}
           >
-            <button
-              className="svc-arrow"
-              aria-label={currentLang === "en" ? "Previous" : "السابق"}
-              onClick={() => scrollToCard(Math.max(0, activeIdx - 1))}
-            >
-              <span className="arrow-symbol">‹</span>
-            </button>
-
             <div
               className="svc-dots"
               role="tablist"
@@ -295,14 +287,6 @@ const WhyUs = () => {
                 />
               ))}
             </div>
-
-            <button
-              className="svc-arrow"
-              aria-label={currentLang === "en" ? "Next" : "التالي"}
-              onClick={() => scrollToCard(Math.min(3, activeIdx + 1))}
-            >
-              <span className="arrow-symbol">›</span>
-            </button>
           </div>
         )}
       </div>

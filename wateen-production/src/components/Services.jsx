@@ -27,35 +27,16 @@ const Services = () => {
         Object.assign(wrapper.style, {
           padding: "0 20px",
           marginTop: "6px",
+          textAlign: "center",
         });
-
-        // Left arrow
-        const left = document.createElement("button");
-        left.className = "svc-arrow";
-        left.setAttribute("aria-label", "Previous services");
-        left.innerHTML =
-          '<i class="fas fa-chevron-left" aria-hidden="true"></i>';
-        left.addEventListener("click", () => scrollByCard(-1));
 
         // Dots container
         const dotsWrap = document.createElement("div");
         dotsWrap.className = "services-controls";
         dotsWrap.setAttribute("role", "tablist");
 
-        // Right arrow
-        const right = document.createElement("button");
-        right.className = "svc-arrow";
-        right.setAttribute("aria-label", "Next services");
-        right.innerHTML =
-          '<i class="fas fa-chevron-right" aria-hidden="true"></i>';
-        right.addEventListener("click", () => scrollByCard(1));
-
         // Append elements
-        wrapper.appendChild(left);
         wrapper.appendChild(dotsWrap);
-        wrapper.appendChild(right);
-
-        // Hint text
 
         // Insert after services section
         const servicesSection = document.querySelector("#services .container");
@@ -127,17 +108,6 @@ const Services = () => {
             card.offsetWidth / 2 -
             servicesGrid.clientWidth / 2;
           servicesGrid.scrollTo({ left: offset, behavior: "smooth" });
-        };
-
-        const scrollByCard = (dir) => {
-          const activeIdx = Array.from(
-            document.querySelectorAll(".svc-dot")
-          ).findIndex((d) => d.classList.contains("active"));
-          const target = Math.min(
-            cards.length - 1,
-            Math.max(0, (activeIdx === -1 ? 0 : activeIdx) + dir)
-          );
-          scrollToCard(target);
         };
 
         window.addEventListener("resize", throttle(updateActiveDot, 200));
