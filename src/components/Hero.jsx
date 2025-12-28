@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 
 /**
@@ -48,8 +48,6 @@ const Hero = () => {
   const stripRef = useRef(null);
   const animatingRef = useRef(false);
   const pauseRef = useRef(false);
-  const autoplayRef = useRef(null);
-  const interactionTimeoutRef = useRef(null);
 
   // Start in the middle set (index 3 = first card of second set)
   const [slideIndex, setSlideIndex] = useState(cards.length);
@@ -63,7 +61,7 @@ const Hero = () => {
   };
 
   // Move to next slide
-  const goNext = () => {
+  const goNext = useCallback(() => {
     if (animatingRef.current) return;
     animatingRef.current = true;
 
@@ -84,10 +82,10 @@ const Hero = () => {
         animatingRef.current = false;
       }
     }, 600);
-  };
+  }, [slideIndex, cards.length]);
 
   // Move to previous slide
-  const goPrev = () => {
+  const goPrev = useCallback(() => {
     if (animatingRef.current) return;
     animatingRef.current = true;
 
@@ -108,7 +106,7 @@ const Hero = () => {
         animatingRef.current = false;
       }
     }, 600);
-  };
+  }, [slideIndex, cards.length]);
 
   // Autoplay
   useEffect(() => {
@@ -116,7 +114,7 @@ const Hero = () => {
       if (!pauseRef.current) goNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [slideIndex]);
+  }, [goNext]);
 
   // Pause on hover
   useEffect(() => {
@@ -152,7 +150,7 @@ const Hero = () => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [slideIndex]);
+  }, [goNext, goPrev]);
 
   // Drag
   useEffect(() => {
@@ -235,7 +233,7 @@ const Hero = () => {
       window.removeEventListener("mouseup", onEnd);
       window.removeEventListener("touchend", onEnd);
     };
-  }, [slideIndex, currentLang]);
+  }, [slideIndex, currentLang, goNext, goPrev]);
 
   // Dot click
   const onDotClick = (index) => {
