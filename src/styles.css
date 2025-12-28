@@ -45,6 +45,7 @@ body {
   -webkit-font-smoothing: antialiased;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Container */
@@ -366,7 +367,7 @@ body::after {
   position: relative;
   padding: 80px 0 64px;
   z-index: 10;
-  overflow: visible;
+  overflow: hidden;
 }
 .hero-inner {
   position: relative;
@@ -2193,4 +2194,469 @@ iframe {
 /* 5) Optional (debug) highlight wide elements briefly if you still see overflow */
 .debug-overflow * {
   outline: 1px solid rgba(255, 0, 0, 0.06);
+}
+
+/* Floating WhatsApp Button */
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  text-decoration: none;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-float svg {
+  width: 28px;
+  height: 28px;
+  fill: white;
+}
+
+/* RTL support for WhatsApp button */
+[dir="rtl"] .whatsapp-float {
+  right: auto;
+  left: 20px;
+}
+/* Hero: card-based centered carousel (no empty gaps while scrolling) */
+.hero-carousel-new {
+  position: relative;
+  width: 100%;
+  overflow: hidden; /* hide overflow while we scroll cards */
+  padding-bottom: 8px; /* room for dots */
+}
+
+.hero-slide-container {
+  display: flex;
+  gap: 16px; /* space between cards */
+  align-items: flex-start;
+  padding: 12px 8px; /* some breathing room left/right */
+  will-change: transform, scroll-position;
+  scroll-snap-type: x mandatory; /* nice snap for pointer/keyboard users */
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto; /* allow native scroll for drag/swipe & keyboard */
+  scrollbar-width: thin;
+}
+
+/* hide native scrollbar visually but keep interaction — optional */
+.hero-slide-container::-webkit-scrollbar {
+  height: 8px;
+}
+.hero-slide-container::-webkit-scrollbar-thumb {
+  background: rgba(11, 18, 32, 0.08);
+  border-radius: 999px;
+}
+
+/* each card is auto-sized (no 100% slides) */
+.podcast-card-new {
+  flex: 0 0 auto; /* don't shrink, width set by min/max */
+  min-width: 260px;
+  max-width: 300px;
+  scroll-snap-align: center; /* snap to center of container */
+  transform-origin: center;
+  transition: transform 280ms cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 220ms;
+}
+
+/* slightly enlarge active card for depth */
+.podcast-card-new.is-active {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(6, 18, 38, 0.08);
+}
+
+/* images and text keep the same rules */
+.podcast-card-new img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+/* dots */
+.hero-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.hero-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s;
+}
+.hero-dot.active {
+  background: var(--accent2);
+  transform: scale(1.15);
+}
+
+/* Prevent horizontal overflow on small screens */
+img,
+picture,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+* {
+  box-sizing: border-box;
+}
+/* Circulating carousel CSS (for the Hero.jsx above) */
+.hero-carousel-circ {
+  position: relative;
+  width: 100%;
+  overflow: hidden; /* viewport hides overflow; strip translates inside */
+  padding-bottom: 8px;
+  margin-top: 18px;
+}
+
+.hero-strip {
+  display: flex;
+  gap: 16px; /* gap must match JS gap var */
+  align-items: flex-start;
+  transform: translateX(0);
+  will-change: transform;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+/* card */
+.podcast-card-circ {
+  flex: 0 0 auto;
+  min-width: 260px;
+  max-width: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.62),
+    rgba(255, 255, 255, 0.52)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 12px;
+  box-shadow: 0 10px 30px rgba(6, 18, 38, 0.06);
+  position: relative;
+  transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 180ms;
+  scroll-snap-align: center;
+}
+
+/* image */
+.podcast-card-circ img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+/* active (centered) card visual */
+.podcast-card-circ.is-active {
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 0 20px 40px rgba(6, 18, 38, 0.12);
+}
+
+/* play button (same as before) */
+.play-overlay-btn {
+  position: absolute;
+  inset: auto;
+  right: 12px;
+  bottom: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: linear-gradient(
+    135deg,
+    rgba(107, 182, 255, 0.95),
+    rgba(255, 122, 193, 0.95)
+  );
+  color: white;
+  box-shadow: 0 10px 30px rgba(107, 182, 255, 0.18);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.podcast-card-circ:hover .play-overlay-btn,
+.podcast-card-circ:focus-within .play-overlay-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* wrapper dragging hint (optional) */
+.hero-carousel-circ.dragging .hero-strip {
+  cursor: grabbing;
+}
+
+/* dots */
+.hero-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.hero-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+.hero-dot.active {
+  background: var(--accent2);
+  transform: scale(1.15);
+}
+
+/* small screens adjustments */
+@media (max-width: 720px) {
+  .podcast-card-circ {
+    min-width: 72%;
+    max-width: 78%;
+  }
+  .play-overlay-btn {
+    right: 10px;
+    bottom: 10px;
+    width: 48px;
+    height: 48px;
+  }
+}
+/* ---------- Circulating 3-card carousel CSS ---------- */
+/* ---------- Circulating 3-card carousel CSS ---------- */
+
+.circ-carousel {
+  width: 100%;
+  overflow: hidden;
+  padding-bottom: 6px;
+  margin-top: 18px;
+  position: relative;
+}
+
+.circ-strip {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  will-change: transform;
+  touch-action: pan-y;
+  cursor: grab;
+  transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  flex-direction: row;
+}
+
+.circ-strip:active {
+  cursor: grabbing;
+}
+
+/* exactly 3 cards visible, fluid widths */
+.circ-card {
+  flex: 0 0 calc((100% - 32px) / 3); /* 3 cards, total gap = 16px * 2 = 32px */
+  min-width: 180px;
+  max-width: 360px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.62),
+    rgba(255, 255, 255, 0.52)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 12px;
+  box-shadow: 0 10px 30px rgba(6, 18, 38, 0.06);
+  position: relative;
+  transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 300ms ease;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* center card gets a subtle lift/scale */
+.circ-card.is-center {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(6, 18, 38, 0.1);
+  z-index: 2;
+}
+
+/* image */
+.circ-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  pointer-events: none;
+}
+
+.circ-card h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #0a1628);
+}
+
+.circ-card .muted {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.4;
+}
+
+/* play button */
+.play-overlay-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: linear-gradient(
+    135deg,
+    rgba(107, 182, 255, 0.95),
+    rgba(255, 122, 193, 0.95)
+  );
+  color: white;
+  box-shadow: 0 10px 30px rgba(107, 182, 255, 0.18);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  cursor: pointer;
+}
+
+.circ-card:hover .play-overlay-btn,
+.circ-card:focus-within .play-overlay-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.play-overlay-btn:hover {
+  box-shadow: 0 12px 35px rgba(107, 182, 255, 0.25);
+}
+
+/* dots */
+.hero-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.hero-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+  padding: 0;
+}
+
+.hero-dot:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.hero-dot.active {
+  background: var(--accent2, #6bb6ff);
+  transform: scale(1.2);
+}
+
+/* responsive tweaks */
+@media (max-width: 920px) {
+  .circ-card {
+    flex: 0 0 calc((100% - 24px) / 3);
+  }
+}
+
+@media (max-width: 720px) {
+  .circ-carousel {
+    margin-top: 24px;
+  }
+
+  .circ-card {
+    min-width: 280px;
+    flex: 0 0 calc(85% - 12px);
+  }
+
+  .circ-strip {
+    gap: 12px;
+  }
+
+  .circ-card img {
+    height: 180px;
+  }
+
+  .circ-card.is-center {
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .play-overlay-btn {
+    right: 10px;
+    bottom: 10px;
+    width: 52px;
+    height: 52px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .play-overlay-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .circ-card {
+    min-width: 260px;
+    flex: 0 0 calc(90% - 10px);
+  }
+
+  .circ-strip {
+    gap: 10px;
+  }
+
+  .circ-card img {
+    height: 160px;
+  }
+
+  .circ-card h4 {
+    font-size: 0.95rem;
+  }
+
+  .circ-card .muted {
+    font-size: 0.8rem;
+  }
+
+  .play-overlay-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .play-overlay-btn svg {
+    width: 22px;
+    height: 22px;
+  }
 }

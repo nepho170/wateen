@@ -2,227 +2,283 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 
 /**
- * Updated Hero
- * - keeps all text exactly the same
- * - replaces Font Awesome icons with SVG/Unicode
- * - improved responsive spacing, autoplay carousel, drag-to-swipe, dots, pause-on-interact
- * - accessible play buttons
+ * Hero.jsx - Fixed Infinite Carousel
+ * - Always shows 3 cards side by side
+ * - Seamless infinite loop with no gaps
  */
 
 const Hero = () => {
   const { currentLang } = useLanguage();
-  const carouselRef = useRef(null);
+
+  const cards = [
+    {
+      key: "ep-preview",
+      titleEn: "Episode Preview",
+      titleAr: "معاينة الحلقة",
+      descEn: "Short audio series produced by WATEEN.",
+      descAr: "سلسلة صوتية قصيرة أنتجتها وتين.",
+      img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9e4c3c5c8a7b7d2a1b1a6a4f6d052d06",
+    },
+    {
+      key: "client-series",
+      titleEn: "Client Series",
+      titleAr: "سلسلة العميل",
+      descEn: "A branded podcast example.",
+      descAr: "مثال على بودكاست مميز.",
+      img: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=2a6f8b5f0b1f2e9d3c6a8d3e6b5f8a1c",
+    },
+    {
+      key: "behind-scenes",
+      titleEn: "Behind the Scenes",
+      titleAr: "ما وراء الكواليس",
+      descEn: "Short documentaries & highlights.",
+      descAr: "وثائقيات قصيرة وأبرز الأحداث.",
+      img: "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=3f5f6a6d7f6e7b6b8c7a7d7a6e7f8c9a",
+    },
+  ];
+
+  // Logical index for dots (0-2)
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Clone cards multiple times for seamless looping
+  // We need at least 2x the original to ensure smooth transitions
+  const extendedCards = [...cards, ...cards, ...cards];
+
+  const wrapperRef = useRef(null);
+  const stripRef = useRef(null);
+  const animatingRef = useRef(false);
+  const pauseRef = useRef(false);
   const autoplayRef = useRef(null);
-  const isInteractingRef = useRef(false);
-  const activeIndexRef = useRef(0);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const cardsCount = 3; // keep in sync with number of podcast-card items
+  const interactionTimeoutRef = useRef(null);
 
-  // Update ref when activeIndex changes
-  useEffect(() => {
-    activeIndexRef.current = activeIndex;
-  }, [activeIndex]);
+  // Start in the middle set (index 3 = first card of second set)
+  const [slideIndex, setSlideIndex] = useState(cards.length);
 
-  // exposed control helpers used by UI buttons/dots
-  const goTo = (idx) => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-    const children = Array.from(carousel.querySelectorAll(".podcast-card"));
-    if (!children[idx]) return;
-    const target = children[idx];
-    const offset =
-      target.offsetLeft + target.offsetWidth / 2 - carousel.clientWidth / 2;
-    carousel.scrollTo({ left: offset, behavior: "smooth" });
-    setActiveIndex(idx);
+  // Get card width + gap
+  const getSlideWidth = () => {
+    const firstCard = stripRef.current?.querySelector(".circ-card");
+    if (!firstCard) return 0;
+    const rect = firstCard.getBoundingClientRect();
+    return rect.width + 16; // 16px gap from CSS
   };
 
-  // Autoplay + drag support
-  useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
+  // Move to next slide
+  const goNext = () => {
+    if (animatingRef.current) return;
+    animatingRef.current = true;
 
-    // Autoplay function
-    const startAutoplay = () => {
-      stopAutoplay();
-      autoplayRef.current = setInterval(() => {
-        if (isInteractingRef.current) return;
-        const nextIndex = (activeIndexRef.current + 1) % cardsCount;
-        goTo(nextIndex);
-      }, 4200);
-    };
-    const stopAutoplay = () => {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current);
-        autoplayRef.current = null;
+    setSlideIndex((prev) => prev + 1);
+    setCurrentIndex((prev) => (prev + 1) % cards.length);
+
+    setTimeout(() => {
+      const strip = stripRef.current;
+      // If we've moved past the middle set, reset to the beginning of middle set
+      if (slideIndex + 1 >= cards.length * 2) {
+        strip.style.transition = "none";
+        setSlideIndex(cards.length);
+        setTimeout(() => {
+          strip.style.transition = "";
+          animatingRef.current = false;
+        }, 50);
+      } else {
+        animatingRef.current = false;
       }
+    }, 600);
+  };
+
+  // Move to previous slide
+  const goPrev = () => {
+    if (animatingRef.current) return;
+    animatingRef.current = true;
+
+    setSlideIndex((prev) => prev - 1);
+    setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length);
+
+    setTimeout(() => {
+      const strip = stripRef.current;
+      // If we've moved before the middle set, reset to the end of middle set
+      if (slideIndex - 1 < cards.length) {
+        strip.style.transition = "none";
+        setSlideIndex(cards.length * 2 - 1);
+        setTimeout(() => {
+          strip.style.transition = "";
+          animatingRef.current = false;
+        }, 50);
+      } else {
+        animatingRef.current = false;
+      }
+    }, 600);
+  };
+
+  // Autoplay
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!pauseRef.current) goNext();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [slideIndex]);
+
+  // Pause on hover
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const onEnter = () => (pauseRef.current = true);
+    const onLeave = () => (pauseRef.current = false);
+
+    wrapper.addEventListener("mouseenter", onEnter);
+    wrapper.addEventListener("mouseleave", onLeave);
+
+    return () => {
+      wrapper.removeEventListener("mouseenter", onEnter);
+      wrapper.removeEventListener("mouseleave", onLeave);
     };
+  }, []);
 
-    // Pause on pointer/touch/enter
-    const onEnter = () => (isInteractingRef.current = true);
-    const onLeave = () => (isInteractingRef.current = false);
-
-    let isDown = false;
-    let startX;
-    let startScroll;
-
-    const onPointerDown = (e) => {
-      isDown = true;
-      isInteractingRef.current = true;
-      startX = e.pageX ?? (e.touches && e.touches[0]?.pageX) ?? 0;
-      startScroll = carousel.scrollLeft;
-      carousel.classList.add("dragging");
-    };
-    const onPointerMove = (e) => {
-      if (!isDown) return;
-      const x = e.pageX ?? (e.touches && e.touches[0]?.pageX) ?? 0;
-      const walk = (startX - x) * 1.0;
-      carousel.scrollLeft = startScroll + walk;
-    };
-    const onPointerUp = () => {
-      isDown = false;
-      isInteractingRef.current = false;
-      carousel.classList.remove("dragging");
-      // snap to nearest card
-      snapToClosest();
-    };
-
-    const snapToClosest = () => {
-      const children = Array.from(carousel.querySelectorAll(".podcast-card"));
-      if (!children.length) return;
-      const center =
-        carousel.getBoundingClientRect().left + carousel.clientWidth / 2;
-      let best = 0;
-      let bestDist = Infinity;
-      children.forEach((c, i) => {
-        const r = c.getBoundingClientRect();
-        const cCenter = r.left + r.width / 2;
-        const d = Math.abs(cCenter - center);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      scrollToCard(best);
-      setActiveIndex(best);
-    };
-
-    const onScroll = () => {
-      // update active index (throttled-ish)
-      window.requestAnimationFrame(() => {
-        const children = Array.from(carousel.querySelectorAll(".podcast-card"));
-        if (!children.length) return;
-        const center =
-          carousel.getBoundingClientRect().left + carousel.clientWidth / 2;
-        let best = 0;
-        let bestDist = Infinity;
-        children.forEach((c, i) => {
-          const r = c.getBoundingClientRect();
-          const cCenter = r.left + r.width / 2;
-          const d = Math.abs(cCenter - center);
-          if (d < bestDist) {
-            bestDist = d;
-            best = i;
-          }
-        });
-        setActiveIndex(best);
-      });
-    };
-
-    // listeners
-    carousel.addEventListener("pointerdown", onPointerDown, { passive: true });
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerup", onPointerUp);
-    carousel.addEventListener("touchstart", onPointerDown, { passive: true });
-    carousel.addEventListener("touchmove", onPointerMove, { passive: true });
-    carousel.addEventListener("touchend", onPointerUp);
-    carousel.addEventListener("mouseenter", onEnter);
-    carousel.addEventListener("mouseleave", onLeave);
-    carousel.addEventListener("scroll", onScroll, { passive: true });
-    carousel.addEventListener("focusin", onEnter);
-    carousel.addEventListener("focusout", onLeave);
-
-    // keyboard navigation
+  // Keyboard
+  useEffect(() => {
     const onKey = (e) => {
       if (e.key === "ArrowRight") {
         e.preventDefault();
-        scrollBy(1);
+        pauseRef.current = true;
+        goNext();
+        setTimeout(() => (pauseRef.current = false), 2000);
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        scrollBy(-1);
+        pauseRef.current = true;
+        goPrev();
+        setTimeout(() => (pauseRef.current = false), 2000);
       }
     };
-    carousel.addEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [slideIndex]);
 
-    // start autoplay
-    startAutoplay();
+  // Drag
+  useEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
 
-    // cleanup
-    return () => {
-      stopAutoplay();
-      carousel.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerup", onPointerUp);
-      carousel.removeEventListener("touchstart", onPointerDown);
-      carousel.removeEventListener("touchmove", onPointerMove);
-      carousel.removeEventListener("touchend", onPointerUp);
-      carousel.removeEventListener("mouseenter", onEnter);
-      carousel.removeEventListener("mouseleave", onLeave);
-      carousel.removeEventListener("scroll", onScroll);
-      carousel.removeEventListener("focusin", onEnter);
-      carousel.removeEventListener("focusout", onLeave);
-      carousel.removeEventListener("keydown", onKey);
+    let startX = 0;
+    let isDragging = false;
+    let currentTranslate = 0;
+    let prevTranslate = 0;
+
+    const getPositionX = (e) =>
+      e.type.includes("mouse") ? e.pageX : e.touches[0].clientX;
+
+    const onStart = (e) => {
+      startX = getPositionX(e);
+      isDragging = true;
+      pauseRef.current = true;
+      const slideWidth = getSlideWidth();
+      const isRTL = currentLang === "ar";
+      prevTranslate = isRTL
+        ? slideIndex * slideWidth
+        : -slideIndex * slideWidth;
+      strip.style.transition = "none";
     };
 
-    // helpers
-    function scrollBy(dir) {
-      const w = carousel.clientWidth;
-      carousel.scrollBy({ left: dir * (w * 0.8), behavior: "smooth" });
-    }
-    function scrollToCard(idx) {
-      const children = Array.from(carousel.querySelectorAll(".podcast-card"));
-      if (!children[idx]) return;
-      const target = children[idx];
-      const offset =
-        target.offsetLeft + target.offsetWidth / 2 - carousel.clientWidth / 2;
-      carousel.scrollTo({ left: offset, behavior: "smooth" });
-    }
-  }, []);
+    const onMove = (e) => {
+      if (!isDragging) return;
+      const currentX = getPositionX(e);
+      const diff = currentX - startX;
+      currentTranslate = prevTranslate + diff;
+      strip.style.transform = `translateX(${currentTranslate}px)`;
+    };
+
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      const slideWidth = getSlideWidth();
+      const movedBy = currentTranslate - prevTranslate;
+      const isRTL = currentLang === "ar";
+
+      strip.style.transition =
+        "transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+
+      // In RTL: swipe right = next, swipe left = prev (opposite of LTR)
+      if (isRTL) {
+        if (movedBy > slideWidth / 4) {
+          goNext();
+        } else if (movedBy < -slideWidth / 4) {
+          goPrev();
+        } else {
+          strip.style.transform = `translateX(${slideIndex * slideWidth}px)`;
+        }
+      } else {
+        if (movedBy < -slideWidth / 4) {
+          goNext();
+        } else if (movedBy > slideWidth / 4) {
+          goPrev();
+        } else {
+          strip.style.transform = `translateX(${-slideIndex * slideWidth}px)`;
+        }
+      }
+
+      setTimeout(() => (pauseRef.current = false), 1000);
+    };
+
+    strip.addEventListener("mousedown", onStart);
+    strip.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchend", onEnd);
+
+    return () => {
+      strip.removeEventListener("mousedown", onStart);
+      strip.removeEventListener("touchstart", onStart);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("touchend", onEnd);
+    };
+  }, [slideIndex, currentLang]);
+
+  // Dot click
+  const onDotClick = (index) => {
+    if (index === currentIndex) return;
+    pauseRef.current = true;
+
+    setSlideIndex(cards.length + index);
+    setCurrentIndex(index);
+
+    setTimeout(() => (pauseRef.current = false), 1000);
+  };
+
+  // Calculate transform with RTL support
+  const slideWidth = getSlideWidth();
+  const isRTL = currentLang === "ar";
+  const transformValue = isRTL
+    ? slideIndex * slideWidth
+    : -slideIndex * slideWidth;
 
   return (
     <section className="hero" id="home" aria-label="Hero Section">
       <div className="container hero-inner">
         <div className="hero-left">
           <h1 className="hero-title">
-            <span data-en="WATEEN Production" data-ar="وتين للإنتاج">
+            <span>
               {currentLang === "en" ? "WATEEN Production" : "وتين للإنتاج"}
             </span>
           </h1>
 
-          <p
-            className="hero-description"
-            data-en="Transforming ideas into engaging media experiences."
-            data-ar="نحول الأفكار إلى تجارب إعلامية جذابة."
-          >
+          <p className="hero-description">
             {currentLang === "en"
               ? "Transforming ideas into engaging media experiences."
               : "نحول الأفكار إلى تجارب إعلامية جذابة."}
           </p>
 
           <div className="hero-buttons">
-            <a
-              href="#services"
-              className="btn btn-primary"
-              data-en="Explore Services"
-              data-ar="استكشف خدماتنا"
-            >
+            <a href="#services" className="btn btn-primary">
               {currentLang === "en" ? "Explore Services" : "استكشف خدماتنا"}{" "}
-              {/* inline SVG arrow (always reliable) */}
               <svg
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
-                focusable="false"
                 style={{ marginLeft: 8, verticalAlign: "middle" }}
               >
                 <path
@@ -236,204 +292,80 @@ const Hero = () => {
               </svg>
             </a>
 
-            <a
-              href="#contact"
-              className="btn btn-secondary"
-              data-en="Get in Touch"
-              data-ar="تواصل معنا"
-            >
+            <a href="#contact" className="btn btn-secondary">
               {currentLang === "en" ? "Get in Touch" : "تواصل معنا"}
             </a>
           </div>
 
-          <div style={{ marginTop: "20px" }}>
-            {/* carousel */}
+          <div style={{ marginTop: 20 }}>
             <div
-              className="podcast-carousel"
-              id="heroCarousel"
-              aria-label="Podcast carousel"
-              ref={carouselRef}
+              className="circ-carousel"
+              ref={wrapperRef}
               tabIndex={0}
+              style={{ direction: currentLang === "ar" ? "rtl" : "ltr" }}
             >
-              {/* card 1 */}
               <div
-                className="podcast-card audio-card"
-                tabIndex="0"
-                role="group"
-                aria-label={
-                  currentLang === "en"
-                    ? "Episode Preview"
-                    : "معاينة الحلقة"
-                }
+                className="circ-strip"
+                ref={stripRef}
+                style={{
+                  transform: `translateX(${transformValue}px)`,
+                  transition: animatingRef.current
+                    ? "transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+                    : "none",
+                }}
               >
-                <img
-                  src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9e4c3c5c8a7b7d2a1b1a6a4f6d052d06"
-                  alt="Podcast cover 1"
-                />
-                <div style={{ paddingTop: "8px" }}>
-                  <h4 data-en="Episode Preview" data-ar="معاينة الحلقة">
-                    {currentLang === "en" ? "Episode Preview" : "معاينة الحلقة"}
-                  </h4>
-                  <p
-                    className="muted"
-                    data-en="Short audio series produced by WATEEN."
-                    data-ar="سلسلة صوتية قصيرة أنتجتها وتين."
-                  >
-                    {currentLang === "en"
-                      ? "Short audio series produced by WATEEN."
-                      : "سلسلة صوتية قصيرة أنتجتها وتين."}
-                  </p>
-                </div>
+                {extendedCards.map((card, idx) => {
+                  // Center card gets special styling
+                  const isCenter = idx === slideIndex;
 
-                {/* accessible play button (uses inline SVG) */}
-                <button
-                  className="play-overlay-btn"
-                  aria-label={
-                    currentLang === "en"
-                      ? "Play Episode Preview"
-                      : "تشغيل معاينة الحلقة"
-                  }
-                >
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M5 3v18l15-9z" fill="currentColor" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* card 2 */}
-              <div
-                className="podcast-card audio-card"
-                tabIndex="0"
-                role="group"
-                aria-label={
-                  currentLang === "en"
-                    ? "Client Series"
-                    : "سلسلة العميل"
-                }
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=2a6f8b5f0b1f2e9d3c6a8d3e6b5f8a1c"
-                  alt="Podcast cover 2"
-                />
-                <div style={{ paddingTop: "8px" }}>
-                  <h4 data-en="Client Series" data-ar="سلسلة العميل">
-                    {currentLang === "en" ? "Client Series" : "سلسلة العميل"}
-                  </h4>
-                  <p
-                    className="muted"
-                    data-en="A branded podcast example."
-                    data-ar="مثال على بودكاست مميز."
-                  >
-                    {currentLang === "en"
-                      ? "A branded podcast example."
-                      : "مثال على بودكاست مميز."}
-                  </p>
-                </div>
-                <button
-                  className="play-overlay-btn"
-                  aria-label={
-                    currentLang === "en"
-                      ? "Play Client Series"
-                      : "تشغيل سلسلة العميل"
-                  }
-                >
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M5 3v18l15-9z" fill="currentColor" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* card 3 */}
-              <div
-                className="podcast-card audio-card"
-                tabIndex="0"
-                role="group"
-                aria-label={
-                  currentLang === "en"
-                    ? "Behind the Scenes"
-                    : "ما وراء الكواليس"
-                }
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1525182008055-f88b95ff7980?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=3f5f6a6d7f6e7b6b8c7a7d7a6e7f8c9a"
-                  alt="Podcast cover 3"
-                />
-                <div style={{ paddingTop: "8px" }}>
-                  <h4 data-en="Behind the Scenes" data-ar="ما وراء الكواليس">
-                    {currentLang === "en" ? "Behind the Scenes" : "ما وراء الكواليس"}
-                  </h4>
-                  <p
-                    className="muted"
-                    data-en="Short documentaries & highlights."
-                    data-ar="وثائقيات قصيرة وأبرز الأحداث."
-                  >
-                    {currentLang === "en"
-                      ? "Short documentaries & highlights."
-                      : "وثائقيات قصيرة وأبرز الأحداث."}
-                  </p>
-                </div>
-                <button
-                  className="play-overlay-btn"
-                  aria-label={
-                    currentLang === "en"
-                      ? "Play Behind the Scenes"
-                      : "تشغيل ما وراء الكواليس"
-                  }
-                >
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M5 3v18l15-9z" fill="currentColor" />
-                  </svg>
-                </button>
+                  return (
+                    <article
+                      key={`${card.key}-${idx}`}
+                      className={`circ-card ${isCenter ? "is-center" : ""}`}
+                    >
+                      <img
+                        src={card.img}
+                        alt={currentLang === "en" ? card.titleEn : card.titleAr}
+                        draggable="false"
+                      />
+                      <div style={{ paddingTop: 8 }}>
+                        <h4>
+                          {currentLang === "en" ? card.titleEn : card.titleAr}
+                        </h4>
+                        <p className="muted">
+                          {currentLang === "en" ? card.descEn : card.descAr}
+                        </p>
+                      </div>
+                      <button
+                        className="play-overlay-btn"
+                        aria-label={`Play ${
+                          currentLang === "en" ? card.titleEn : card.titleAr
+                        }`}
+                      >
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path d="M5 3v18l15-9z" fill="currentColor" />
+                        </svg>
+                      </button>
+                    </article>
+                  );
+                })}
               </div>
             </div>
 
-            {/* carousel controls (dots only) */}
-            <div
-              className="podcast-controls"
-              aria-hidden={false}
-              style={{ marginTop: 12, textAlign: "center" }}
-            >
-              <div
-                className="svc-dots"
-                role="tablist"
-                style={{
-                  display: "inline-flex",
-                  gap: 8,
-                  margin: "0 12px",
-                  verticalAlign: "middle",
-                }}
-              >
-                {Array.from({ length: cardsCount }).map((_, i) => (
-                  <button
-                    key={i}
-                    className={`svc-dot ${i === activeIndex ? "active" : ""}`}
-                    onClick={() => goTo(i)}
-                    aria-label={`${i + 1} ${
-                      currentLang === "en" ? "podcast" : "بودكاست"
-                    }`}
-                    role="tab"
-                    aria-selected={i === activeIndex}
-                  />
-                ))}
-              </div>
+            <div className="hero-dots" style={{ marginTop: 12 }}>
+              {cards.map((_, i) => (
+                <button
+                  key={i}
+                  className={`hero-dot ${i === currentIndex ? "active" : ""}`}
+                  onClick={() => onDotClick(i)}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
