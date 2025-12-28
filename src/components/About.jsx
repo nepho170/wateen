@@ -149,7 +149,7 @@ const About = () => {
               }}
             >
               <img
-                src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1400&auto=format&fit=crop&ixlib=rb-4.0.3&s=c4b1b3b1d6a5c3e6f7b2a1d5c3e6f9a2"
+                src={`${process.env.PUBLIC_URL}/hero.png`}
                 alt="Studio session"
                 style={{
                   width: "100%",

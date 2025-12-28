@@ -17,6 +17,21 @@ const Hero = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const cardsCount = 3; // keep in sync with number of podcast-card items
 
+  // exposed control helpers used by UI buttons/dots
+  const goTo = (idx) => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+    const children = Array.from(carousel.querySelectorAll(".podcast-card"));
+    if (!children[idx]) return;
+    const target = children[idx];
+    const offset =
+      target.offsetLeft + target.offsetWidth / 2 - carousel.clientWidth / 2;
+    carousel.scrollTo({ left: offset, behavior: "smooth" });
+    setActiveIndex(idx);
+  };
+  const next = () => goTo(Math.min(cardsCount - 1, activeIndex + 1));
+  const prev = () => goTo(Math.max(0, activeIndex - 1));
+
   // Autoplay + drag support
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -27,10 +42,8 @@ const Hero = () => {
       stopAutoplay();
       autoplayRef.current = setInterval(() => {
         if (isInteractingRef.current) return;
-        carousel.scrollBy({
-          left: carousel.clientWidth * 0.8,
-          behavior: "smooth",
-        });
+        const nextIndex = (activeIndex + 1) % cardsCount;
+        goTo(nextIndex);
       }, 4200);
     };
     const stopAutoplay = () => {
@@ -171,21 +184,6 @@ const Hero = () => {
     }
   }, []);
 
-  // exposed control helpers used by UI buttons/dots
-  const goTo = (idx) => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-    const children = Array.from(carousel.querySelectorAll(".podcast-card"));
-    if (!children[idx]) return;
-    const target = children[idx];
-    const offset =
-      target.offsetLeft + target.offsetWidth / 2 - carousel.clientWidth / 2;
-    carousel.scrollTo({ left: offset, behavior: "smooth" });
-    setActiveIndex(idx);
-  };
-  const next = () => goTo(Math.min(cardsCount - 1, activeIndex + 1));
-  const prev = () => goTo(Math.max(0, activeIndex - 1));
-
   return (
     <section className="hero" id="home" aria-label="Hero Section">
       <div className="container hero-inner">
@@ -258,16 +256,28 @@ const Hero = () => {
                 className="podcast-card audio-card"
                 tabIndex="0"
                 role="group"
-                aria-label="Episode Preview"
+                aria-label={
+                  currentLang === "en"
+                    ? "Episode Preview"
+                    : "معاينة الحلقة"
+                }
               >
                 <img
                   src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9e4c3c5c8a7b7d2a1b1a6a4f6d052d06"
                   alt="Podcast cover 1"
                 />
                 <div style={{ paddingTop: "8px" }}>
-                  <h4>Episode Preview</h4>
-                  <p className="muted">
-                    Short audio series produced by WATEEN.
+                  <h4 data-en="Episode Preview" data-ar="معاينة الحلقة">
+                    {currentLang === "en" ? "Episode Preview" : "معاينة الحلقة"}
+                  </h4>
+                  <p
+                    className="muted"
+                    data-en="Short audio series produced by WATEEN."
+                    data-ar="سلسلة صوتية قصيرة أنتجتها وتين."
+                  >
+                    {currentLang === "en"
+                      ? "Short audio series produced by WATEEN."
+                      : "سلسلة صوتية قصيرة أنتجتها وتين."}
                   </p>
                 </div>
 
@@ -297,15 +307,29 @@ const Hero = () => {
                 className="podcast-card audio-card"
                 tabIndex="0"
                 role="group"
-                aria-label="Client Series"
+                aria-label={
+                  currentLang === "en"
+                    ? "Client Series"
+                    : "سلسلة العميل"
+                }
               >
                 <img
                   src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=2a6f8b5f0b1f2e9d3c6a8d3e6b5f8a1c"
                   alt="Podcast cover 2"
                 />
                 <div style={{ paddingTop: "8px" }}>
-                  <h4>Client Series</h4>
-                  <p className="muted">A branded podcast example.</p>
+                  <h4 data-en="Client Series" data-ar="سلسلة العميل">
+                    {currentLang === "en" ? "Client Series" : "سلسلة العميل"}
+                  </h4>
+                  <p
+                    className="muted"
+                    data-en="A branded podcast example."
+                    data-ar="مثال على بودكاست مميز."
+                  >
+                    {currentLang === "en"
+                      ? "A branded podcast example."
+                      : "مثال على بودكاست مميز."}
+                  </p>
                 </div>
                 <button
                   className="play-overlay-btn"
@@ -332,15 +356,29 @@ const Hero = () => {
                 className="podcast-card audio-card"
                 tabIndex="0"
                 role="group"
-                aria-label="Behind the Scenes"
+                aria-label={
+                  currentLang === "en"
+                    ? "Behind the Scenes"
+                    : "ما وراء الكواليس"
+                }
               >
                 <img
                   src="https://images.unsplash.com/photo-1525182008055-f88b95ff7980?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=3f5f6a6d7f6e7b6b8c7a7d7a6e7f8c9a"
                   alt="Podcast cover 3"
                 />
                 <div style={{ paddingTop: "8px" }}>
-                  <h4>Behind the Scenes</h4>
-                  <p className="muted">Short documentaries & highlights.</p>
+                  <h4 data-en="Behind the Scenes" data-ar="ما وراء الكواليس">
+                    {currentLang === "en" ? "Behind the Scenes" : "ما وراء الكواليس"}
+                  </h4>
+                  <p
+                    className="muted"
+                    data-en="Short documentaries & highlights."
+                    data-ar="وثائقيات قصيرة وأبرز الأحداث."
+                  >
+                    {currentLang === "en"
+                      ? "Short documentaries & highlights."
+                      : "وثائقيات قصيرة وأبرز الأحداث."}
+                  </p>
                 </div>
                 <button
                   className="play-overlay-btn"
