@@ -14,8 +14,14 @@ const Hero = () => {
   const carouselRef = useRef(null);
   const autoplayRef = useRef(null);
   const isInteractingRef = useRef(false);
+  const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const cardsCount = 3; // keep in sync with number of podcast-card items
+
+  // Update ref when activeIndex changes
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
 
   // exposed control helpers used by UI buttons/dots
   const goTo = (idx) => {
@@ -29,8 +35,6 @@ const Hero = () => {
     carousel.scrollTo({ left: offset, behavior: "smooth" });
     setActiveIndex(idx);
   };
-  const next = () => goTo(Math.min(cardsCount - 1, activeIndex + 1));
-  const prev = () => goTo(Math.max(0, activeIndex - 1));
 
   // Autoplay + drag support
   useEffect(() => {
@@ -42,7 +46,7 @@ const Hero = () => {
       stopAutoplay();
       autoplayRef.current = setInterval(() => {
         if (isInteractingRef.current) return;
-        const nextIndex = (activeIndex + 1) % cardsCount;
+        const nextIndex = (activeIndexRef.current + 1) % cardsCount;
         goTo(nextIndex);
       }, 4200);
     };
