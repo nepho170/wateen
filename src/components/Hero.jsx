@@ -263,7 +263,11 @@ const Hero = () => {
             </span>
           </h1>
 
-          <p className="hero-description" data-aos="fade-up" data-aos-delay="400">
+          <p
+            className="hero-description"
+            data-aos="fade-up"
+            data-aos-delay="400"
+          >
             {currentLang === "en"
               ? "Transforming ideas into engaging media experiences."
               : "نحول الأفكار إلى تجارب إعلامية جذابة."}
@@ -295,7 +299,11 @@ const Hero = () => {
             </a>
           </div>
 
-          <div style={{ marginTop: 20 }} data-aos="fade-up" data-aos-delay="800">
+          <div
+            style={{ marginTop: 20 }}
+            data-aos="fade-up"
+            data-aos-delay="800"
+          >
             <div
               className="circ-carousel"
               ref={wrapperRef}
