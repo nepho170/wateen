@@ -243,19 +243,19 @@ const Hero = () => {
     <section className="hero" id="home" aria-label="Hero Section">
       <div className="container hero-inner">
         <div className="hero-left">
-          <h1 className="hero-title">
+          <h1 className="hero-title" data-aos="fade-up">
             <span>
               {currentLang === "en" ? "WATEEN Production" : "وتين للإنتاج"}
             </span>
           </h1>
 
-          <p className="hero-description">
+          <p className="hero-description" data-aos="fade-up" data-aos-delay="200">
             {currentLang === "en"
               ? "Transforming ideas into engaging media experiences."
               : "نحول الأفكار إلى تجارب إعلامية جذابة."}
           </p>
 
-          <div className="hero-buttons">
+          <div className="hero-buttons" data-aos="fade-up" data-aos-delay="400">
             <a href="#services" className="btn btn-primary">
               {currentLang === "en" ? "Explore Services" : "استكشف خدماتنا"}{" "}
               <svg
@@ -281,7 +281,7 @@ const Hero = () => {
             </a>
           </div>
 
-          <div style={{ marginTop: 20 }}>
+          <div style={{ marginTop: 20 }} data-aos="fade-in" data-aos-delay="600">
             <div
               className="circ-carousel"
               ref={wrapperRef}
