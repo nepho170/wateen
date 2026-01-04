@@ -173,12 +173,12 @@ const WhyUs = () => {
               <i className="fas fa-flag" aria-hidden="true"></i>
             </div>
             <h3
-              data-en="First Emirati AI Production"
-              data-ar="أول إنتاج إماراتي بالذكاء الاصطناعي"
+              data-en="First Emirati AI Production "
+              data-ar="أول إنتاج إماراتي بالذكاء الاصطناعي 🇦🇪"
             >
               {currentLang === "en"
-                ? "First Emirati AI Production"
-                : "أول إنتاج إماراتي بالذكاء الاصطناعي"}
+                ? "First Emirati AI Production 🇦🇪"
+                : "أول إنتاج إماراتي بالذكاء الاصطناعي 🇦🇪"}
             </h3>
             <p
               data-en="First Emirati Production Company engaging AI in our model."
@@ -199,8 +199,8 @@ const WhyUs = () => {
             <div className="why-icon">
               <i className="fas fa-landmark" aria-hidden="true"></i>
             </div>
-            <h3 data-en="Government Trust" data-ar="ثقة حكومية">
-              {currentLang === "en" ? "Government Trust" : "ثقة حكومية"}
+            <h3 data-en="Government Trust �️" data-ar="ثقة حكومية 🏛️">
+              {currentLang === "en" ? "Government Trust 🏛️" : "ثقة حكومية 🏛️"}
             </h3>
             <p
               data-en="Trusted by government entities for delivering excellence."
@@ -221,8 +221,8 @@ const WhyUs = () => {
             <div className="why-icon">
               <i className="fas fa-users" aria-hidden="true"></i>
             </div>
-            <h3 data-en="Expert Team" data-ar="فريق خبير">
-              {currentLang === "en" ? "Expert Team" : "فريق خبير"}
+            <h3 data-en="Expert Team 👥" data-ar="فريق خبير 👥">
+              {currentLang === "en" ? "Expert Team 👥" : "فريق خبير 👥"}
             </h3>
             <p
               data-en="A team of skilled professionals with extensive industry experience."
@@ -243,8 +243,10 @@ const WhyUs = () => {
             <div className="why-icon">
               <i className="fas fa-check-circle" aria-hidden="true"></i>
             </div>
-            <h3 data-en="Long-term Value" data-ar="قيمة طويلة الأمد">
-              {currentLang === "en" ? "Long-term Value" : "قيمة طويلة الأمد"}
+            <h3 data-en="Long-term Value 💎" data-ar="قيمة طويلة الأمد 💎">
+              {currentLang === "en"
+                ? "Long-term Value 💎"
+                : "قيمة طويلة الأمد 💎"}
             </h3>
             <p
               data-en="Content designed for long-term value, not one-time use."
@@ -265,10 +267,13 @@ const WhyUs = () => {
             <div className="why-icon">
               <i className="fas fa-map-marked-alt" aria-hidden="true"></i>
             </div>
-            <h3 data-en="UAE Media Expertise" data-ar="خبرة إعلامية إماراتية">
+            <h3
+              data-en="UAE Media Expertise 📺"
+              data-ar="خبرة إعلامية إماراتية 📺"
+            >
               {currentLang === "en"
-                ? "UAE Media Expertise"
-                : "خبرة إعلامية إماراتية"}
+                ? "UAE Media Expertise 📺"
+                : "خبرة إعلامية إماراتية 📺"}
             </h3>
             <p
               data-en="Strong understanding of UAE media landscape and cultural context."
@@ -289,10 +294,13 @@ const WhyUs = () => {
             <div className="why-icon">
               <i className="fas fa-book-open" aria-hidden="true"></i>
             </div>
-            <h3 data-en="Strategic Storytelling" data-ar="سرد قصصي استراتيجي">
+            <h3
+              data-en="Strategic Storytelling 📖"
+              data-ar="سرد قصصي استراتيجي 📖"
+            >
               {currentLang === "en"
-                ? "Strategic Storytelling"
-                : "سرد قصصي استراتيجي"}
+                ? "Strategic Storytelling 📖"
+                : "سرد قصصي استراتيجي 📖"}
             </h3>
             <p
               data-en="Professional storytelling with strategic depth and purpose."
@@ -313,10 +321,13 @@ const WhyUs = () => {
             <div className="why-icon">
               <i className="fas fa-video" aria-hidden="true"></i>
             </div>
-            <h3 data-en="High-Quality Production" data-ar="إنتاج عالي الجودة">
+            <h3
+              data-en="High-Quality Production �"
+              data-ar="إنتاج عالي الجودة 🎥"
+            >
               {currentLang === "en"
-                ? "High-Quality Production"
-                : "إنتاج عالي الجودة"}
+                ? "High-Quality Production 🎥"
+                : "إنتاج عالي الجودة 🎥"}
             </h3>
             <p
               data-en="High-quality audio & visual production with attention to detail."
@@ -337,8 +348,8 @@ const WhyUs = () => {
             <div className="why-icon">
               <i className="fas fa-location-arrow" aria-hidden="true"></i>
             </div>
-            <h3 data-en="Flexible Solutions" data-ar="حلول مرنة">
-              {currentLang === "en" ? "Flexible Solutions" : "حلول مرنة"}
+            <h3 data-en="Flexible Solutions 🔄" data-ar="حلول مرنة 🔄">
+              {currentLang === "en" ? "Flexible Solutions 🔄" : "حلول مرنة 🔄"}
             </h3>
             <p
               data-en="Flexible on-site & studio solutions tailored to your needs."
