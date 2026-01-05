@@ -150,12 +150,12 @@ const Contact = () => {
                   {currentLang === "en" ? "Website" : "الموقع الإلكتروني"}
                 </h4>
                 <a
-                  href="https://www.wateenproduction.ae"
+                  href="https://www.wateenproduction.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   dir="ltr"
                 >
-                  www.wateenproduction.ae
+                  www.wateenproduction.com
                 </a>
               </div>
             </div>
